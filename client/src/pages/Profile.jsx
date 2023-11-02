@@ -11,6 +11,9 @@ import {
   updateUserStart,
   updateUserFailure,
   updateUserSuccess,
+  deleteUserStart,
+  deleteUserFailure,
+  deleteUserSuccess,
 } from '../redux/user/userSlice.js';
 import { useDispatch } from 'react-redux';
 
@@ -80,7 +83,24 @@ export default function Profile() {
       dispatch(updateUserSuccess(data));
       setUpdateSuccess(true);
     } catch (error) {
-      dispatch(updateUserFailure(error.message));
+      dispatch(deleteUserFailure(error.message));
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
     }
   };
 
@@ -103,13 +123,17 @@ export default function Profile() {
         />
         <p className="text-sm self-center">
           {fileUploadError ? (
-            <span className="text-red-700">
-              Error uploading Image(image must be less than 2 mb)
+            <span className="text-red-700 animated fadeIn">
+              Error uploading Image (image must be less than 2 MB)
             </span>
           ) : filePerc > 0 && filePerc < 100 ? (
-            <span className="text-slate-700">{`Uploading ${filePerc}%`}</span>
+            <span className="text-slate-700 animated fadeIn">
+              {`Uploading ${filePerc}%`}
+            </span>
           ) : filePerc === 100 ? (
-            <span className="text-green-800">Successfully Uploaded!</span>
+            <span className="text-green-800 animated fadeIn">
+              Successfully Uploaded!
+            </span>
           ) : (
             ''
           )}
@@ -138,20 +162,24 @@ export default function Profile() {
         />
         <button
           disabled={loading}
-          className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
+          className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:
+          opacity-80"
         >
           {loading ? 'Loading...' : 'Update'}
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer">Delete Account</span>
+        <span
+          onClick={handleDeleteUser}
+          className="text-red-700 cursor-pointer"
+        >
+          Delete Account
+        </span>
         <span className="text-red-700 cursor-pointer">Sign Out</span>
       </div>
       <p className="text-red-700 mt-5">{error ? error : ''}</p>
       <p className="text-green-700 mt-5">
-        {updateSuccess
-          ? 'Successfully updated profile'
-          : 'Failed to update profile'}
+        {updateSuccess ? 'User is updated successfully!' : ''}
       </p>
     </div>
   );
