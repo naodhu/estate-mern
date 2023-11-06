@@ -8,6 +8,8 @@ import {
 import { app } from '../firebase';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
@@ -32,6 +34,7 @@ export default function CreateListing() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   console.log(formData);
+
   const handleImageSubmit = (e) => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
       setUploading(true);
@@ -334,36 +337,46 @@ export default function CreateListing() {
               {uploading ? 'Uploading...' : 'Upload'}
             </button>
           </div>
-          <p className="text-red-700 text-sm">
+          <p
+            className={
+              imageUploadError
+                ? 'transition-all duration-500 ease-in-out transform translate-x-0 opacity-100 bg-red-600 text-white font-semibold text-sm p-2 rounded-md'
+                : 'transition-all duration-500 ease-in-out transform -translate-x-full opacity-0'
+            }
+          >
             {imageUploadError && imageUploadError}
           </p>
           {formData.imageUrls.length > 0 &&
             formData.imageUrls.map((url, index) => (
               <div
                 key={url}
-                className="flex justify-between p-3 border items-center"
+                className="flex justify-between p-3 border items-center bg-white shadow rounded-lg my-2 transform transition-transform duration-500 hover:scale-105"
               >
                 <img
                   src={url}
                   alt="listing image"
-                  className="w-20 h-20 object-contain rounded-lg"
+                  className="w-24 h-24 object-cover rounded-lg"
                 />
                 <button
                   type="button"
                   onClick={() => handleRemoveImage(index)}
-                  className="p-3 text-red-700 rounded-lg uppercase hover:opacity-75"
+                  className="p-2 bg-red-500 text-white rounded-lg uppercase hover:bg-red-700 transform transition-transform duration-500 hover:scale-125"
                 >
-                  Delete
+                  <FontAwesomeIcon icon={faTrash} />
                 </button>
               </div>
             ))}
           <button
             disabled={loading || uploading}
-            className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
+            className="p-3 bg-blue-500 text-white rounded-lg uppercase tracking-wider hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors duration-200"
           >
             {loading ? 'Creating...' : 'Create listing'}
           </button>
-          {error && <p className="text-red-700 text-sm">{error}</p>}
+          {error && (
+            <p className="text-red-700 text-sm mt-2 bg-red-200 p-2 rounded-md">
+              {error}
+            </p>
+          )}
         </div>
       </form>
     </main>
